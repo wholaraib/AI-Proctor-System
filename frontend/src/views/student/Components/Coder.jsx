@@ -39,7 +39,7 @@ export default function Coder() {
       </select>
 
       <Editor
-        height="300px"
+        height="450px"
         language={language}
         value={code}
         onChange={handleEditorChange}
