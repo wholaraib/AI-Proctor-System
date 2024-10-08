@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Editor } from '@monaco-editor/react';
 import axios from 'axios';
 
-export default function Coder() {
+export default function Coder({ submitTest }) {
   const [code, setCode] = useState('// Write your code here...');
   const [output, setOutput] = useState('');
   const [language, setLanguage] = useState('javascript'); // Default to JavaScript
@@ -29,6 +29,9 @@ export default function Coder() {
       setOutput(`Error: ${error.message}`);
     }
   };
+  function handleSubmit() {
+    submitTest();
+  }
 
   return (
     <div style={{ padding: '20px' }}>
@@ -53,6 +56,8 @@ export default function Coder() {
         <strong>Output:</strong>
         <pre>{output}</pre>
       </div>
+
+      <button onClick={handleSubmit}>Submit Test</button>
     </div>
   );
 }
