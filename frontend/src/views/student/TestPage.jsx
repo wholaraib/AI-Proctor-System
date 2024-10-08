@@ -10,6 +10,7 @@ import { useGetExamsQuery, useGetQuestionsQuery } from '../../slices/examApiSlic
 import { useSaveCheatingLogMutation } from 'src/slices/cheatingLogApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import Coder from './Components/Coder';
 
 const TestPage = () => {
   const { examId, testId } = useParams();
