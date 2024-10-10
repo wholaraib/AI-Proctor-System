@@ -173,9 +173,11 @@ const DescriptionAndInstructions = () => {
             control={<Checkbox checked={certify} onChange={handleCertifyChange} color="primary" />}
             label="I certify that I have carefully read and agree to all of the instructions mentioned above"
           />
-          <Button variant="contained" color="primary" disabled={!certify} onClick={handleTest}>
-            Start Test
-          </Button>
+          <div style={{ display: 'flex', padding: '2px', margin: '10px' }}>
+            <Button variant="contained" color="primary" disabled={!certify} onClick={handleTest}>
+              Start Test
+            </Button>
+          </div>
         </Stack>
       </CardContent>
     </Card>

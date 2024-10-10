@@ -14,7 +14,7 @@ const Logo = () => {
     <LinkStyled to="/">
       <LogoDark height={70} />
     </LinkStyled>
-  )
+  );
 };
 
 export default Logo;

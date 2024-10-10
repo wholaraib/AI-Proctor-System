@@ -20,6 +20,7 @@ export default function MultipleChoiceQuestion({ questions, saveUserTestScore, s
   const [selectedOption, setSelectedOption] = useState(null);
   const [score, setScore] = useState(0);
   const navigate = useNavigate();
+  const { examId } = useParams();
 
   const [isLastQuestion, setIsLastQuestion] = useState(false);
   const [isFinishTest, setisFinishTest] = useState(false);
@@ -41,7 +42,7 @@ export default function MultipleChoiceQuestion({ questions, saveUserTestScore, s
       saveUserTestScore();
     }
     if (isLastQuestion) {
-      navigate('/exam/code');
+      navigate(`/exam/${examId}/codedetails`);
     }
 
     // submitTest();

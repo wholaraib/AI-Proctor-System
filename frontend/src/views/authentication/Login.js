@@ -100,7 +100,19 @@ const Login = () => {
           >
             <Card elevation={9} sx={{ p: 4, zIndex: 1, width: '100%', maxWidth: '500px' }}>
               <Box display="flex" alignItems="center" justifyContent="center">
-                <Logo />
+                <Typography
+                  variant="h4" // Choose a suitable variant (h1, h2, h3, h4, h5, h6, subtitle1, subtitle2, body1, body2, etc.)
+                  component="h1" // This will render an <h1> element
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#1976d2', // Primary color or any color you prefer
+                    margin: '20px 0',
+                    textAlign: 'center',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)', // Optional shadow effect
+                  }}
+                >
+                  AI_Evalu8
+                </Typography>
               </Box>
               <AuthLogin
                 formik={formik}

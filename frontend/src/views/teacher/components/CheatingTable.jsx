@@ -79,6 +79,7 @@ export default function CheatingTable() {
               <TableCell>Multiple Face Count</TableCell>
               <TableCell>Cell Phone Count</TableCell>
               <TableCell>Prohibited Object Count</TableCell>
+              <TableCell>ScreenShot</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -91,6 +92,7 @@ export default function CheatingTable() {
                 <TableCell>{log.multipleFaceCount}</TableCell>
                 <TableCell>{log.cellPhoneCount}</TableCell>
                 <TableCell>{log.prohibitedObjectCount}</TableCell>
+                <TableCell>{log.screenshot}</TableCell>
               </TableRow>
             ))}
           </TableBody>

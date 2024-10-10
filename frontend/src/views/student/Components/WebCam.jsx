@@ -3,7 +3,6 @@ import * as tf from '@tensorflow/tfjs';
 import * as cocossd from '@tensorflow-models/coco-ssd';
 import Webcam from 'react-webcam';
 import { drawRect } from './utilities';
-
 import { Box, Card } from '@mui/material';
 import swal from 'sweetalert';
 
@@ -13,7 +12,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
 
   const runCoco = async () => {
     const net = await cocossd.load();
-    console.log('Ai models loaded.');
+    console.log('AI model loaded.');
 
     setInterval(() => {
       detect(net);
@@ -27,9 +26,6 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       webcamRef.current.video.readyState === 4
     ) {
       const video = webcamRef.current.video;
-      if (!video) {
-        alert('sorry');
-      }
       const videoWidth = webcamRef.current.video.videoWidth;
       const videoHeight = webcamRef.current.video.videoHeight;
 
@@ -40,8 +36,10 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       canvasRef.current.height = videoHeight;
 
       const obj = await net.detect(video);
-
       const ctx = canvasRef.current.getContext('2d');
+
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); // Clear canvas before drawing
+      drawRect(obj, ctx); // Use drawRect function to visualize detections
 
       let person_count = 0;
       if (obj.length < 1) {
@@ -67,7 +65,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
           swal('Prohibited Object Detected', 'Action has been Recorded', 'error');
         }
 
-        if (!element.class === 'person') {
+        if (element.class !== 'person') {
           swal('Face Not Visible', 'Action has been Recorded', 'error');
         }
         if (element.class === 'person') {
@@ -84,6 +82,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       });
     }
   };
+
   useEffect(() => {
     runCoco();
   }, []);
@@ -98,8 +97,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
             left: 0,
             right: 0,
             textAlign: 'center',
-            zindex: 9,
-
+            zIndex: 9,
             width: '100%',
             height: '100%',
           }}
@@ -114,7 +112,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
             left: 0,
             right: 0,
             textAlign: 'center',
-            zindex: 8,
+            zIndex: 8,
             width: 240,
             height: 240,
           }}
