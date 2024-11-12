@@ -38,18 +38,17 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       const obj = await net.detect(video);
       const ctx = canvasRef.current.getContext('2d');
 
+      let person_count = 0;
+      let faceDetected = false;
+
+      // Clear the canvas and draw detection boxes
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); // Clear canvas before drawing
       drawRect(obj, ctx); // Use drawRect function to visualize detections
 
-      let person_count = 0;
-      if (obj.length < 1) {
-        updateCheatingLog((prevLog) => ({
-          ...prevLog,
-          noFaceCount: prevLog.noFaceCount + 1,
-        }));
-        swal('Face Not Visible', 'Action has been Recorded', 'error');
-      }
+      // Loop through detected objects
       obj.forEach((element) => {
+        console.log('Detected class:', element.class); // Log the class names for debugging
+
         if (element.class === 'cell phone') {
           updateCheatingLog((prevLog) => ({
             ...prevLog,
@@ -57,6 +56,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
           }));
           swal('Cell Phone Detected', 'Action has been Recorded', 'error');
         }
+
         if (element.class === 'book') {
           updateCheatingLog((prevLog) => ({
             ...prevLog,
@@ -65,10 +65,8 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
           swal('Prohibited Object Detected', 'Action has been Recorded', 'error');
         }
 
-        if (element.class !== 'person') {
-          swal('Face Not Visible', 'Action has been Recorded', 'error');
-        }
         if (element.class === 'person') {
+          faceDetected = true; // Mark that face (person) is detected
           person_count++;
           if (person_count > 1) {
             updateCheatingLog((prevLog) => ({
@@ -80,6 +78,15 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
           }
         }
       });
+
+      // Show 'Face Not Visible' if no face is detected
+      if (!faceDetected) {
+        updateCheatingLog((prevLog) => ({
+          ...prevLog,
+          noFaceCount: prevLog.noFaceCount + 1,
+        }));
+        swal('Face Not Visible', 'Action has been Recorded', 'error');
+      }
     }
   };
 
@@ -113,8 +120,8 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
             right: 0,
             textAlign: 'center',
             zIndex: 8,
-            width: 240,
-            height: 240,
+            width: '100%',
+            height: '100%',
           }}
         />
       </Card>
