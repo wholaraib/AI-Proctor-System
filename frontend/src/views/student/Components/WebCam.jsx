@@ -9,6 +9,57 @@ import swal from 'sweetalert';
 export default function Home({ cheatingLog, updateCheatingLog }) {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const [isSpeechRecognitionSupported, setIsSpeechRecognitionSupported] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState('hi-IN'); // Default language Hindi
+
+  // Initialize SpeechRecognition
+  const recognition = useRef(null);
+
+  const setupSpeechRecognition = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setIsSpeechRecognitionSupported(false);
+      return;
+    }
+
+    recognition.current = new SpeechRecognition();
+    recognition.current.continuous = true;
+    recognition.current.interimResults = true;
+
+    recognition.current.lang = selectedLanguage; // Set the language based on user preference
+
+    recognition.current.onresult = (event) => {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      console.log('Recognized Speech:', transcript);
+      handleVoiceCommands(transcript);
+    };
+
+    recognition.current.onstart = () => {
+      console.log('Speech Recognition started');
+    };
+
+    recognition.current.onend = () => {
+      console.log('Speech Recognition stopped');
+    };
+
+    recognition.current.onerror = (event) => {
+      console.log('Speech Recognition error:', event.error);
+    };
+  };
+
+  const handleVoiceCommands = (transcript) => {
+    const command = transcript.toLowerCase().trim();
+    console.log('Command received:', command);
+
+    if (command.includes('pause')) {
+      swal('Pause', 'Action has been recorded: Paused Video', 'info');
+      // Pause functionality here
+    } else if (command.includes('play')) {
+      swal('Play', 'Action has been recorded: Play Video', 'info');
+      // Play functionality here
+    }
+  };
 
   const runCoco = async () => {
     const net = await cocossd.load();
@@ -38,14 +89,12 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       const obj = await net.detect(video);
       const ctx = canvasRef.current.getContext('2d');
 
-      let person_count = 0;
-      let faceDetected = false;
-
-      // Clear the canvas and draw detection boxes
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); // Clear canvas before drawing
       drawRect(obj, ctx); // Use drawRect function to visualize detections
 
-      // Loop through detected objects
+      let person_count = 0;
+      let faceDetected = false;
+
       obj.forEach((element) => {
         console.log('Detected class:', element.class); // Log the class names for debugging
 
@@ -68,6 +117,7 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
         if (element.class === 'person') {
           faceDetected = true; // Mark that face (person) is detected
           person_count++;
+
           if (person_count > 1) {
             updateCheatingLog((prevLog) => ({
               ...prevLog,
@@ -92,7 +142,9 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
 
   useEffect(() => {
     runCoco();
-  }, []);
+    setupSpeechRecognition();
+    recognition.current.start();
+  }, [selectedLanguage]); // Re-run when language is changed
 
   return (
     <Box>
@@ -109,7 +161,6 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
             height: '100%',
           }}
         />
-
         <canvas
           ref={canvasRef}
           style={{
@@ -120,11 +171,20 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
             right: 0,
             textAlign: 'center',
             zIndex: 8,
-            width: '100%',
-            height: '100%',
+            width: 240,
+            height: 240,
           }}
         />
       </Card>
+      {!isSpeechRecognitionSupported && <p>Your browser does not support speech recognition.</p>}
+
+      <div>
+        <label>Select Language: </label>
+        <select onChange={(e) => setSelectedLanguage(e.target.value)} value={selectedLanguage}>
+          <option value="hi-IN">Hindi (India)</option>
+          <option value="mr-IN">Marathi (India)</option>
+        </select>
+      </div>
     </Box>
   );
 }
