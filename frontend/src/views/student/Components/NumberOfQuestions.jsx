@@ -5,6 +5,7 @@ import questions from './questionData';
 import BlankCard from 'src/components/shared/BlankCard';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import Countdown from 'react-countdown';
+
 const NumberOfQuestions = ({ questionLength, submitTest, examDurationInSeconds }) => {
   const totalQuestions = questionLength; //questions.length;
   // Generate an array of question numbers from 1 to totalQuestions
@@ -13,7 +14,7 @@ const NumberOfQuestions = ({ questionLength, submitTest, examDurationInSeconds }
     // Set the current question to the selected question number
     // setCurrentQuestion(questionNumber);
   };
-
+// alert(NumberOfQuestions)
   // Create an array of rows, each containing up to 4 question numbers
   const rows = [];
   for (let i = 0; i < questionNumbers.length; i += 5) {

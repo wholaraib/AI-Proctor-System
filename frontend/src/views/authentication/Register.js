@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { useRegisterMutation } from './../../slices/usersApiSlice';
 import { setCredentials } from './../../slices/authSlice';
 import Loader from './Loader';
+import sitLogo from './sit_logo.jpg';
 
 const userValidationSchema = yup.object({
   name: yup.string().min(2).max(25).required('Please enter your name'),
@@ -105,6 +106,15 @@ const Register = () => {
             alignItems="center"
           >
             <Card elevation={9} sx={{ p: 2, zIndex: 1, width: '100%', maxWidth: '500px' }}>
+            <div>
+                <img src={sitLogo} style={{
+                  width: '50px',
+                  height: '50px',
+                  position: 'relative',
+                  left: '200px',
+                  top: '10px',
+                }} alt="SIT Logo" />
+              </div>
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Typography
                   variant="h4" // Choose a suitable variant (h1, h2, h3, h4, h5, h6, subtitle1, subtitle2, body1, body2, etc.)
@@ -117,7 +127,7 @@ const Register = () => {
                     textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)', // Optional shadow effect
                   }}
                 >
-                  AI_Evalu8
+                  SecureExam
                 </Typography>
               </Box>
               <AuthRegister

@@ -10,27 +10,14 @@ import { useGetExamsQuery, useGetQuestionsQuery } from '../../slices/examApiSlic
 import { useSaveCheatingLogMutation } from 'src/slices/cheatingLogApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import Coder from './Coder';
 
 const TestPage = () => {
-  const { examId, testId } = useParams();
-
+  const { examId } = useParams();
   const [selectedExam, setSelectedExam] = useState([]);
-  const [examDurationInSeconds, setexamDurationInSeconds] = useState(0);
-  const { data: userExamdata } = useGetExamsQuery();
-
-  useEffect(() => {
-    if (userExamdata) {
-      const exam = userExamdata.filter((exam) => {
-        return exam.examId === examId;
-      });
-      setSelectedExam(exam);
-      setexamDurationInSeconds(exam[0].duration * 60);
-    }
-  }, [userExamdata]);
-
+  const [examDurationInSeconds, setExamDurationInSeconds] = useState(0);
+  const { data: userExamData } = useGetExamsQuery();
   const [questions, setQuestions] = useState([]);
-  const { data, isLoading } = useGetQuestionsQuery(examId);
+  const { data, isLoading, error } = useGetQuestionsQuery(examId);
   const [score, setScore] = useState(0);
   const navigate = useNavigate();
 
@@ -41,16 +28,106 @@ const TestPage = () => {
     multipleFaceCount: 0,
     cellPhoneCount: 0,
     ProhibitedObjectCount: 0,
-    examId: examId,
     username: '',
     email: '',
   });
+
+  const [tabSwitchTimeout, setTabSwitchTimeout] = useState(null);
+
+  useEffect(() => {
+    if (userExamData) {
+      const exam = userExamData.find((exam) => exam.examId === examId);
+      if (exam) {
+        setSelectedExam(exam);
+        setExamDurationInSeconds(exam.duration * 60);
+        setCheatingLog((prevLog) => ({
+          ...prevLog,
+          examId: examId,
+        }));
+      }
+    }
+  }, [userExamData, examId]);
 
   useEffect(() => {
     if (data) {
       setQuestions(data);
     }
   }, [data]);
+
+  const blockCopyPaste = (event) => {
+    event.preventDefault();
+    toast.warn('Copy, cut, and paste are disabled!');
+  };
+
+  useEffect(() => {
+    document.addEventListener('copy', blockCopyPaste);
+    document.addEventListener('cut', blockCopyPaste);
+    document.addEventListener('paste', blockCopyPaste);
+
+    return () => {
+      document.removeEventListener('copy', blockCopyPaste);
+      document.removeEventListener('cut', blockCopyPaste);
+      document.removeEventListener('paste', blockCopyPaste);
+    };
+  }, []);
+
+  useEffect(() => {
+    enterFullscreen();
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        toast.warn('You switched tabs! Return to the test within 10 seconds or it will be terminated.', {
+          autoClose: 10000,
+        });
+
+        const timeout = setTimeout(() => {
+          if (document.hidden) {
+            handleTestSubmission();
+          }
+        }, 10000);
+
+        setTabSwitchTimeout(timeout);
+      } else {
+        clearTimeout(tabSwitchTimeout);
+        setTabSwitchTimeout(null);
+      }
+    };
+
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        toast.warn('You exited fullscreen! Return within 10 seconds or the test will be terminated.', {
+          autoClose: 10000,
+        });
+
+        const timeout = setTimeout(() => {
+          if (!document.fullscreenElement) {
+            handleTestSubmission();
+          }
+        }, 10000);
+
+        setTabSwitchTimeout(timeout);
+      } else {
+        clearTimeout(tabSwitchTimeout);
+        setTabSwitchTimeout(null);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      clearTimeout(tabSwitchTimeout);
+    };
+  }, [tabSwitchTimeout]);
+
+  const enterFullscreen = () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      element.requestFullscreen().catch((err) => console.error('Fullscreen request failed: ', err));
+    }
+  };
 
   const handleTestSubmission = async () => {
     try {
@@ -60,24 +137,22 @@ const TestPage = () => {
         email: userInfo.email,
       }));
 
-      await saveCheatingLog(cheatingLog);
-
       await saveCheatingLogMutation(cheatingLog).unwrap();
-
-      toast.success('User Logs Saved!!');
-
+      toast.success('Test submitted and cheating log saved!');
       navigate(`/Success`);
     } catch (error) {
-      console.log('cheatlog: ', error);
+      console.error('Error submitting test or saving log:', error);
     }
   };
-  const saveUserTestScore = () => {
-    setScore(score + 1);
-  };
 
-  const saveCheatingLog = async (cheatingLog) => {
-    console.log(cheatingLog);
-  };
+  if (isLoading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return <div>Error loading questions</div>;
+  }
+
   return (
     <PageContainer title="TestPage" description="This is TestPage">
       <Box pt="3rem">
@@ -93,13 +168,13 @@ const TestPage = () => {
                 alignItems="center"
                 justifyContent="center"
               >
-                {isLoading ? (
-                  <CircularProgress />
+                {questions.length === 0 ? (
+                  <div>No questions available</div>
                 ) : (
                   <MultipleChoiceQuestion
                     submitTest={handleTestSubmission}
-                    questions={data}
-                    saveUserTestScore={saveUserTestScore}
+                    questions={questions}
+                    saveUserTestScore={() => setScore(score + 1)}
                   />
                 )}
               </Box>

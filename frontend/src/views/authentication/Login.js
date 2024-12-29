@@ -16,6 +16,7 @@ import { useLoginMutation } from './../../slices/usersApiSlice';
 import { setCredentials } from './../../slices/authSlice';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
+import sitLogo from './sit_logo.jpg';
 
 const userValidationSchema = yup.object({
   email: yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
@@ -88,6 +89,7 @@ const Login = () => {
         }}
       >
         <Grid container spacing={0} justifyContent="center" sx={{ height: '100vh' }}>
+
           <Grid
             item
             xs={12}
@@ -99,6 +101,15 @@ const Login = () => {
             alignItems="center"
           >
             <Card elevation={9} sx={{ p: 4, zIndex: 1, width: '100%', maxWidth: '500px' }}>
+              <div>
+                <img src={sitLogo} style={{
+                  width: '50px',
+                  height: '50px',
+                  position: 'relative',
+                  left: '135px',
+                  top: '10px',
+                }} alt="SIT Logo" />
+              </div>
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Typography
                   variant="h4" // Choose a suitable variant (h1, h2, h3, h4, h5, h6, subtitle1, subtitle2, body1, body2, etc.)
@@ -111,7 +122,7 @@ const Login = () => {
                     textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)', // Optional shadow effect
                   }}
                 >
-                  AI_Evalu8
+                  SecureExam
                 </Typography>
               </Box>
               <AuthLogin
@@ -124,7 +135,6 @@ const Login = () => {
                 subtitle={
                   <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
                     <Typography color="textSecondary" variant="h6" fontWeight="500">
-                      New to Modernize?
                     </Typography>
                     <Typography
                       component={Link}

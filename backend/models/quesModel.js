@@ -24,7 +24,7 @@ const questionSchema = mongoose.Schema(
       default: 0,
     },
     examId: {
-      type: String, // Use the same data type (String) as in the exam model
+      type: String, 
       required: true,
       // You can make examId required if it's always present
     },
